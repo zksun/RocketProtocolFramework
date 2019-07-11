@@ -223,7 +223,8 @@ public class InvokerFactory {
         byte[] code = clsWriter.toByteArray();
 
         try {
-            IOUtils.write(clsWriter.toByteArray(), new FileOutputStream("/Users/hanshou/Documents/work/feature/sun-enhance/enhance-common/target/test-classes/com/sun/enhance/domain/" + getClassName(clazz) + ".class"));
+            String userHome = System.getenv("user.home");
+            IOUtils.write(clsWriter.toByteArray(), new FileOutputStream(userHome + getClassName(clazz) + ".class"));
         } catch (IOException e) {
             e.printStackTrace();
         }

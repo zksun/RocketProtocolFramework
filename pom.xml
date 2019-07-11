@@ -10,6 +10,7 @@
     <modules>
         <module>rocket-protocol-bundle</module>
         <module>rocket-protocol-common</module>
+        <module>rocket-prtocol-core</module>
     </modules>
 
     <parent>
