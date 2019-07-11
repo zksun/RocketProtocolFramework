@@ -223,7 +223,7 @@ public class InvokerFactory {
         byte[] code = clsWriter.toByteArray();
 
         try {
-            String userHome = System.getenv("user.home");
+            String userHome = System.getProperty("user.dir") + "/target/";
             IOUtils.write(clsWriter.toByteArray(), new FileOutputStream(userHome + getClassName(clazz) + ".class"));
         } catch (IOException e) {
             e.printStackTrace();
