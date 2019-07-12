@@ -9,7 +9,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
  */
 
 @SpringBootApplication
-@ServletComponentScan
+@ServletComponentScan("com.rocket.framework")
 public class StateMachineApplication {
     public static void main(String[] args) {
         SpringApplication.run(StateMachineApplication.class, args);
