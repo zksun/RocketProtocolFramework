@@ -91,8 +91,44 @@ public class InvokerFactory {
             }
 
             mw.visitInsn(AALOAD);
-            mw.visitTypeInsn(CHECKCAST, getType(aClass));
+            mw.visitTypeInsn(CHECKCAST, getDescType(aClass));
+            dealPrimitiveParameter(aClass, mw);
         }
+    }
+
+    private void dealPrimitiveParameter(Class<?> type, MethodVisitor mw) {
+        if (!type.isPrimitive()) {
+            return;
+        }
+
+        if (Integer.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
+            return;
+        } else if (Boolean.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+            return;
+        } else if (Character.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false);
+            return;
+        } else if (Byte.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false);
+            return;
+        } else if (Short.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false);
+            return;
+        } else if (Float.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false);
+            return;
+        } else if (Long.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false);
+            return;
+        } else if (Double.TYPE.equals(type)) {
+            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false);
+            return;
+        }
+
+        throw new IllegalStateException("Type: " + type.getCanonicalName()
+                + " is not a primitive type");
     }
 
     private void createInvokeSource(Class<?> clazz, ClassWriter classWriter) {
@@ -319,10 +355,6 @@ public class InvokerFactory {
 
     }
 
-    private String createCheckOverloadMethodName(String methodName, int i) {
-        return "check_" + methodName + "_params_" + i;
-    }
-
     private void createOverloadCheckMethod(ClassWriter classWriter, MethodDesc methodDesc, String methodName) {
         if (!methodDesc.hasParameter()) {
             MethodVisitor methodVisitor = classWriter.visitMethod(ACC_PRIVATE, methodName,
@@ -366,6 +398,21 @@ public class InvokerFactory {
     private void createParameterCheckMethod(MethodVisitor mw, MethodDesc methodDesc) {
         Label start = new Label();
         mw.visitLabel(start);
+
+        mw.visitInsn(ACONST_NULL);
+        mw.visitVarInsn(ALOAD, 1);
+        Label ifacmpeq = new Label();
+        mw.visitJumpInsn(IF_ACMPEQ, ifacmpeq);
+        mw.visitVarInsn(ALOAD, 1);
+        mw.visitInsn(ARRAYLENGTH);
+        mw.visitInsn(ICONST_2);
+        Label ificmpeq = new Label();
+        mw.visitJumpInsn(IF_ICMPEQ, ificmpeq);
+        mw.visitLabel(ifacmpeq);
+        mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        mw.visitInsn(ICONST_0);
+        mw.visitInsn(IRETURN);
+        mw.visitLabel(ificmpeq);
 
         mw.visitVarInsn(ALOAD, 1);
         mw.visitInsn(ARRAYLENGTH);

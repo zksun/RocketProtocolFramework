@@ -24,4 +24,11 @@ public class InvokerTest {
         System.out.println(returnValue);
     }
 
+    @Test
+    public void invokerTest2() {
+        Invoker invoker = InvokerFactory.getInvoker(new InvokerOverloadTestBean());
+        Object doSomething = invoker.invoke("doSomething", null, null);
+        System.out.println(doSomething);
+    }
+
 }

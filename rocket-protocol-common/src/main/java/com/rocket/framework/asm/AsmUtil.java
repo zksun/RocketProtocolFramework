@@ -1,5 +1,7 @@
 package com.rocket.framework.asm;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Created by zjsun on 2019/7/11.
  */
@@ -77,6 +79,10 @@ public class AsmUtil {
         return className;
     }
 
+    private String createCheckOverloadMethodNameInner(String methodName, int i) {
+        return "check_" + methodName + "_params_" + i;
+    }
+
     private String getPrimitiveLetterInner(Class<?> type) {
         if (Integer.TYPE.equals(type)) {
             return "I";
@@ -147,6 +153,13 @@ public class AsmUtil {
             throw new NullPointerException("type cannot be null");
         }
         return instance.getDescInner(type);
+    }
+
+    public static String createCheckOverloadMethodName(String methodName, int seq) {
+        if (StringUtils.isEmpty(methodName)) {
+            throw new NullPointerException("method name can not be empty");
+        }
+        return instance.createCheckOverloadMethodNameInner(methodName, seq);
     }
 
 
