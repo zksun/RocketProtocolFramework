@@ -12,15 +12,15 @@ public class InvokerTest {
     @Test
     public void invokerTest0() {
         Invoker invoker = InvokerFactory.getInvoker(new InvokerTestBean());
-        Object returnValue = invoker.invoke("complexMethod", new String[]{"one", "two", "three"});
+        Object returnValue = invoker.invoke("complexMethod", new String[]{"one", "two", "three"}, new Class<?>[]{String.class, String.class, String.class});
         System.out.println(returnValue);
     }
 
     @Test
     public void invokerTest1() {
         Invoker invoker = InvokerFactory.getInvoker(new InvokerTestBean());
-        invoker.invoke("setSomething", new String[]{"hello world"});
-        String returnValue = (String) invoker.invoke("getSomething", null);
+        invoker.invoke("setSomething", new String[]{"hello world"}, new Class[]{String.class});
+        String returnValue = (String) invoker.invoke("getSomething", null, null);
         System.out.println(returnValue);
     }
 
