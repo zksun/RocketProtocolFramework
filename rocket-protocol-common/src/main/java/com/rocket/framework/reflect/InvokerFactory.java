@@ -404,7 +404,7 @@ public class InvokerFactory {
         mw.visitJumpInsn(IF_ACMPEQ, ifacmpeq);
         mw.visitVarInsn(ALOAD, 1);
         mw.visitInsn(ARRAYLENGTH);
-        mw.visitInsn(ICONST_2);
+        mw.visitIntInsn(BIPUSH, methodDesc.getParameterCount());
         Label ificmpeq = new Label();
         mw.visitJumpInsn(IF_ICMPEQ, ificmpeq);
         mw.visitLabel(ifacmpeq);
@@ -481,10 +481,13 @@ public class InvokerFactory {
                 mw.visitFieldInsn(GETSTATIC, getDescType(aClass), "TYPE", "Ljava/lang/Class;");
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
-                mw.visitInsn(IRETURN);
-                mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                Label ifne = new Label();
+                mw.visitJumpInsn(IFNE, ifne);
+                Label branch = new Label();
+                mw.visitLabel(branch);
                 mw.visitInsn(ICONST_0);
                 mw.visitInsn(IRETURN);
+                mw.visitLabel(ifne);
             } else {
                 mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 mw.visitVarInsn(ALOAD, 1);

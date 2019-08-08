@@ -24,4 +24,8 @@ public class InvokerOverloadTestBean {
     public void doSomething(Integer seq, String something) {
         System.out.printf("do something with parameter: Integer %d, String %s%n", seq, something);
     }
+
+    public void doSomething(int seq, int seq1, String something) {
+        System.out.printf("do something with parameter: Integer %d, String %s%n", seq, something);
+    }
 }
