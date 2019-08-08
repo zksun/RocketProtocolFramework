@@ -268,7 +268,6 @@ public class InvokerFactory {
         mw.visitMaxs(1, 1);
         mw.visitEnd();
 
-
     }
 
     private Invoker createInvoker(final Class<?> clazz, final Object source) {
@@ -414,30 +413,18 @@ public class InvokerFactory {
         mw.visitInsn(IRETURN);
         mw.visitLabel(ificmpeq);
 
-        mw.visitVarInsn(ALOAD, 1);
-        mw.visitInsn(ARRAYLENGTH);
-        mw.visitIntInsn(BIPUSH, methodDesc.getParameterCount());
-        Label branch = new Label();
-        mw.visitJumpInsn(IF_ICMPEQ, branch);
-
-        mw.visitVarInsn(ALOAD, 1);
-        mw.visitInsn(ARRAYLENGTH);
-        mw.visitVarInsn(ALOAD, 2);
-        mw.visitInsn(ARRAYLENGTH);
-        mw.visitJumpInsn(IF_ICMPEQ, branch);
-
-        Label equal = new Label();
-        mw.visitLabel(equal);
-        mw.visitInsn(ICONST_0);
-        mw.visitInsn(IRETURN);
-        mw.visitLabel(branch);
-
         for (int i = 0; i < methodDesc.getParameterCount(); i++) {
             Class<?> aClass = methodDesc.parameterTypes()[i];
-            mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mw.visitVarInsn(ALOAD, 1);
+            if (aClass.isPrimitive()) {
+                Label catch_0 = new Label();
+                Label catch_1 = new Label();
+                Label catch_2 = new Label();
+                mw.visitTryCatchBlock(catch_0, catch_1, catch_2, "java/lang/ClassCastException");
 
-            if (!aClass.isPrimitive()) {
+                mw.visitLabel(catch_0);
+                mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+
+                mw.visitVarInsn(ALOAD, 1);
                 if (i == 0) {
                     mw.visitInsn(ICONST_0);
                 } else if (i == 1) {
@@ -454,44 +441,88 @@ public class InvokerFactory {
                     mw.visitIntInsn(BIPUSH, i);
                 }
                 mw.visitInsn(AALOAD);
-                mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+
+
+                mw.visitTypeInsn(CHECKCAST, getDescType(aClass));
+                dealPrimitiveParameter(aClass, mw);
+                mw.visitInsn(POP);
+                mw.visitLabel(catch_1);
+
+                Label go_to = new Label();
+                mw.visitJumpInsn(GOTO, go_to);
+                mw.visitLabel(catch_2);
+                mw.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/ClassCastException"});
+                mw.visitVarInsn(ASTORE, 3);
+                Label back = new Label();
+                mw.visitLabel(back);
+                mw.visitInsn(ICONST_0);
+                mw.visitInsn(IRETURN);
+                mw.visitLabel(go_to);
+                mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                mw.visitVarInsn(ALOAD, 2);
+                if (i == 0) {
+                    mw.visitInsn(ICONST_0);
+                } else if (i == 1) {
+                    mw.visitInsn(ICONST_1);
+                } else if (i == 2) {
+                    mw.visitInsn(ICONST_2);
+                } else if (i == 3) {
+                    mw.visitInsn(ICONST_3);
+                } else if (i == 4) {
+                    mw.visitInsn(ICONST_4);
+                } else if (i == 5) {
+                    mw.visitInsn(ICONST_5);
+                } else {
+                    mw.visitIntInsn(BIPUSH, i);
+                }
+
+                mw.visitInsn(AALOAD);
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
-            } else {
                 mw.visitFieldInsn(GETSTATIC, getDescType(aClass), "TYPE", "Ljava/lang/Class;");
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
-            }
-
-            mw.visitVarInsn(ALOAD, 2);
-            if (i == 0) {
+                mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+                mw.visitInsn(IRETURN);
+                mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 mw.visitInsn(ICONST_0);
-            } else if (i == 1) {
-                mw.visitInsn(ICONST_1);
-            } else if (i == 2) {
-                mw.visitInsn(ICONST_2);
-            } else if (i == 3) {
-                mw.visitInsn(ICONST_3);
-            } else if (i == 4) {
-                mw.visitInsn(ICONST_4);
-            } else if (i == 5) {
-                mw.visitInsn(ICONST_5);
+                mw.visitInsn(IRETURN);
             } else {
-                mw.visitIntInsn(BIPUSH, i);
-            }
-            mw.visitInsn(AALOAD);
-            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
-            mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+                mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                mw.visitVarInsn(ALOAD, 1);
+                if (i == 0) {
+                    mw.visitInsn(ICONST_0);
+                } else if (i == 1) {
+                    mw.visitInsn(ICONST_1);
+                } else if (i == 2) {
+                    mw.visitInsn(ICONST_2);
+                } else if (i == 3) {
+                    mw.visitInsn(ICONST_3);
+                } else if (i == 4) {
+                    mw.visitInsn(ICONST_4);
+                } else if (i == 5) {
+                    mw.visitInsn(ICONST_5);
+                } else {
+                    mw.visitIntInsn(BIPUSH, i);
+                }
 
-            Label ifne = new Label();
-            mw.visitJumpInsn(IFNE, ifne);
-            branch = new Label();
-            mw.visitLabel(branch);
-            mw.visitInsn(ICONST_0);
-            mw.visitInsn(IRETURN);
-            mw.visitLabel(ifne);
-            mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+
+                mw.visitInsn(AALOAD);
+                mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+                mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
+                mw.visitLdcInsn(Type.getType(getDesc(aClass)));
+                mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
+                mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+
+                Label ifne = new Label();
+                mw.visitJumpInsn(IFNE, ifne);
+                Label branch = new Label();
+                mw.visitLabel(branch);
+                mw.visitInsn(ICONST_0);
+                mw.visitInsn(IRETURN);
+                mw.visitLabel(ifne);
+            }
         }
 
-        mw.visitInsn(ICONST_1);
+        mw.visitInsn(ICONST_0);
         mw.visitInsn(IRETURN);
 
         Label end = new Label();

@@ -27,8 +27,13 @@ public class InvokerTest {
     @Test
     public void invokerTest2() {
         Invoker invoker = InvokerFactory.getInvoker(new InvokerOverloadTestBean());
-        Object doSomething = invoker.invoke("doSomething", null, null);
+        Object doSomething = invoker.invoke("doSomething", new String[]{"aaa", "bbbb"}, new Class[]{String.class, String.class});
         System.out.println(doSomething);
+    }
+
+    @Test
+    public void invokerTest3() {
+        InvokerMockTestBean invokerMockTestBean = new InvokerMockTestBean(new InvokerOverloadTestBean());invokerMockTestBean.invoke("doSomething", new String[]{"aaa", "bbbb"}, new Class[]{String.class, String.class});
     }
 
 }
