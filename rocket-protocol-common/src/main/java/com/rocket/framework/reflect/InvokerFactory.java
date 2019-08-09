@@ -460,6 +460,7 @@ public class InvokerFactory {
                 mw.visitLabel(go_to);
                 mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 mw.visitVarInsn(ALOAD, 2);
+
                 if (i == 0) {
                     mw.visitInsn(ICONST_0);
                 } else if (i == 1) {
@@ -481,13 +482,6 @@ public class InvokerFactory {
                 mw.visitFieldInsn(GETSTATIC, getDescType(aClass), "TYPE", "Ljava/lang/Class;");
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
-                Label ifne = new Label();
-                mw.visitJumpInsn(IFNE, ifne);
-                Label branch = new Label();
-                mw.visitLabel(branch);
-                mw.visitInsn(ICONST_0);
-                mw.visitInsn(IRETURN);
-                mw.visitLabel(ifne);
             } else {
                 mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 mw.visitVarInsn(ALOAD, 1);
@@ -514,18 +508,19 @@ public class InvokerFactory {
                 mw.visitLdcInsn(Type.getType(getDesc(aClass)));
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getTypeName", "()Ljava/lang/String;", false);
                 mw.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
-
-                Label ifne = new Label();
-                mw.visitJumpInsn(IFNE, ifne);
-                Label branch = new Label();
-                mw.visitLabel(branch);
-                mw.visitInsn(ICONST_0);
-                mw.visitInsn(IRETURN);
-                mw.visitLabel(ifne);
             }
+
+            Label ifne = new Label();
+            mw.visitJumpInsn(IFNE, ifne);
+            Label branch = new Label();
+            mw.visitLabel(branch);
+            mw.visitInsn(ICONST_0);
+            mw.visitInsn(IRETURN);
+            mw.visitLabel(ifne);
+            mw.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         }
 
-        mw.visitInsn(ICONST_0);
+        mw.visitInsn(ICONST_1);
         mw.visitInsn(IRETURN);
 
         Label end = new Label();
